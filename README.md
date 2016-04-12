@@ -1,2 +1,0 @@
-# Chattapp
-Chatting app.
