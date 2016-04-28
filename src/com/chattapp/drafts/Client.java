@@ -1,13 +1,6 @@
-/*
- * Decompiled with CFR 0_114.
- * 
- * Could not load the following classes:
- *  com.chattapp.drafts.presentation.fx.FXMLEx
- *  javafx.application.Application
- */
 package com.chattapp.drafts;
 
-import com.chattapp.drafts.presentation.fx.FXMLEx;
+import com.chattapp.drafts.FXMLEx;
 import javafx.application.Application;
 
 public class Client

@@ -10,11 +10,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-class FXMLController
-implements Runnable {
+class FXMLControllerY implements Runnable {
     private final /* synthetic */ OutputStream val$os;
 
-    FXMLController(OutputStream outputStream) {
+    FXMLControllerY(OutputStream outputStream) {
         this.val$os = outputStream;
     }
 

@@ -18,11 +18,10 @@ import java.util.Collection;
 import java.util.Iterator;
 import javafx.fxml.FXMLLoader;
 
-class FXMLEx
-implements Runnable {
+class FXMLExZ implements Runnable {
     private final /* synthetic */ FXMLLoader val$loader;
 
-    FXMLEx(FXMLLoader fXMLLoader) {
+    FXMLExZ(FXMLLoader fXMLLoader) {
         this.val$loader = fXMLLoader;
     }
 

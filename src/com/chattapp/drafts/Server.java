@@ -1,6 +1,3 @@
-/*
- * Decompiled with CFR 0_114.
- */
 package com.chattapp.drafts;
 
 import com.chattapp.drafts.Main;
@@ -47,11 +44,12 @@ implements Runnable {
                 }
                 catch (IOException e) {
                     e.printStackTrace();
-                    if (serverSocket == null) break block15;
+                    if (serverSocket == null)
+                    	break block15;
                     try {
                         serverSocket.close();
                     }
-                    catch (IOException e) {
+                    catch (IOException e1) {
                         e.printStackTrace();
                     }
                 }

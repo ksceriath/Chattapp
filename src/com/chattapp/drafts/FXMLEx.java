@@ -1,14 +1,3 @@
-/*
- * Decompiled with CFR 0_114.
- * 
- * Could not load the following classes:
- *  com.chattapp.drafts.Main
- *  javafx.application.Application
- *  javafx.fxml.FXMLLoader
- *  javafx.scene.Parent
- *  javafx.scene.Scene
- *  javafx.stage.Stage
- */
 package com.chattapp.drafts;
 
 import com.chattapp.drafts.Main;
@@ -26,8 +15,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-public class FXMLEx
-extends Application {
+public class FXMLEx extends Application {
+	
     public void start(Stage primaryStage) throws Exception {
         final FXMLLoader loader = new FXMLLoader(this.getClass().getResource("fxmlEx.fxml"));
         Parent root = (Parent)loader.load();

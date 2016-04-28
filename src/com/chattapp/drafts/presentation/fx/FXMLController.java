@@ -1,13 +1,3 @@
-/*
- * Decompiled with CFR 0_114.
- * 
- * Could not load the following classes:
- *  com.chattapp.drafts.Main
- *  javafx.event.ActionEvent
- *  javafx.fxml.FXML
- *  javafx.scene.control.TextArea
- *  javafx.scene.text.Text
- */
 package com.chattapp.drafts.presentation.fx;
 
 import com.chattapp.drafts.Main;
