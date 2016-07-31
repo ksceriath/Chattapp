@@ -8,7 +8,7 @@
  */
 package com.chattapp.drafts.presentation.fx;
 
-import com.chattapp.drafts.Main;
+import com.chattapp.drafts.Controller;
 import com.chattapp.drafts.presentation.fx.FXMLController;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,9 +27,9 @@ class FXMLExZ implements Runnable {
 
     @Override
     public void run() {
-        while (Main.getConnections().isEmpty()) {
+        while (Controller.getConnections().isEmpty()) {
         }
-        Socket s = (Socket)Main.getConnections().values().iterator().next();
+        Socket s = (Socket)Controller.getConnections().values().iterator().next();
         try {
             InputStream is = s.getInputStream();
             OutputStream os = s.getOutputStream();

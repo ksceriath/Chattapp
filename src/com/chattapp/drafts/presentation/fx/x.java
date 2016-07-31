@@ -18,7 +18,7 @@ class FXMLControllerX implements Runnable {
         int i = 0;
         try {
             while ((i = this.val$is.read()) != -1) {
-                com.chattapp.drafts.presentation.fx.FXMLController.access$0((com.chattapp.drafts.presentation.fx.FXMLController)FXMLControllerX.this).appendText(String.valueOf(i));
+                com.chattapp.drafts.presentation.fx.FXMLController.access$0((com.chattapp.drafts.presentation.fx.FXMLController)FXMLController.this).appendText(String.valueOf(i));
             }
         }
         catch (IOException e) {

@@ -1,6 +1,6 @@
 package com.chattapp.drafts.presentation.fx;
 
-import com.chattapp.drafts.Main;
+import com.chattapp.drafts.Controller;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -64,7 +64,7 @@ public class FXMLController {
         this.actionTarget.setText("button pressed!");
         try {
             Socket s = new Socket("localhost", 8080);
-            Main.addConnection((InetAddress)s.getInetAddress(), (Socket)s);
+            Controller.addConnection((InetAddress)s.getInetAddress(), (Socket)s);
         }
         catch (IOException e) {
             e.printStackTrace();
