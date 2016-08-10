@@ -38,7 +38,7 @@ public class Controller implements Runnable, Handler{
     }
     
     public boolean addConnection(ClientSocketManager.ConBag s) {
-    	if(!runningConversations.containsKey(s.socket.getInetAddress())) {
+    	if(!runningConversations.containsKey(s.socket.getInetAddress().toString())) {
     		return queuedConBags.offer(s);
     	}
     	return true;
@@ -56,16 +56,18 @@ public class Controller implements Runnable, Handler{
 			if(addConnection(x)) {
 				System.out.println(Thread.currentThread().getName()+":Queued "+x.host);
 			}
-			return x.host+x.port;
+			return x.host+":"+x.port;
 		}
 		return null;
 	}
     
     @Override
     public void terminateConversation(String connTo) {
-    	System.out.println(Thread.currentThread().getName()+":Terminate "+connTo+" - request received.");
     	try {
-			runningConversations.get(InetAddress.getAllByName(connTo)).keepAlive(false);
+    		connTo = InetAddress.getByName(connTo).toString();
+    		connTo = connTo.substring(connTo.indexOf('/')+1);
+    		System.out.println(Thread.currentThread().getName()+":Terminate "+connTo+" - request received.");
+			runningConversations.get(connTo).kill();
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
@@ -145,13 +147,14 @@ public class Controller implements Runnable, Handler{
 						runningConversations.put(x.host, conv);
 					}
 					conv.startStreamMappers();
+					System.out.println(runningConversations.keySet());
 				}
 			}
 			System.out.println(Thread.currentThread().getName()+":Stopping processing.");
 			csm.keepAlive = false;
 			ssm.keepAlive = false;
 			for(Conversation conv : runningConversations.values()) {
-				conv.keepAlive(false);
+				conv.kill();
 			}
 		}
 		catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {

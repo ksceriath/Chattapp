@@ -40,6 +40,7 @@ public class ServerSocketManager implements Runnable {
         	while (keepAlive) {
         		try {
         			Socket socket = serverSocket.accept();
+        			socket.setSoTimeout(1);
         			System.out.println(Thread.currentThread().getName()+":"+socket.getInetAddress()+" requesting connection.");
         			controller.addUnConnection(new ClientSocketManager.ConBag(socket));
         			continue;

@@ -17,14 +17,19 @@ public class ClientSocketManager implements Runnable {
 		Socket socket;
 		ConBag(Socket x) {
 			socket = x;
-			host = x.getInetAddress().toString();
+			host = x.getInetAddress().toString().substring(1);
 			port = x.getPort();
 		}
 		ConBag(String host, int port, InputStream ip, OutputStream op) {
-			this.host = host;
-			this.port = port;
-			this.readFrom = ip;
-			this.writeTo = op;
+			try {
+				this.host = InetAddress.getByName(host).toString();
+				this.host = this.host.substring(this.host.indexOf('/')+1);
+				this.port = port;
+				this.readFrom = ip;
+				this.writeTo = op;
+			} catch (UnknownHostException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -52,6 +57,7 @@ public class ClientSocketManager implements Runnable {
 						InetAddress.getByName(request.host)!=null) {
 					System.out.println(Thread.currentThread().getName()+":Connecting to "+request.host);
 					request.socket = new Socket(InetAddress.getByName(request.host), request.port);
+					request.socket.setSoTimeout(1);
 					if(controller.addConnection(request)) {
 						System.out.println(Thread.currentThread().getName()+":Queued "+request.host);
 					}
@@ -72,8 +78,9 @@ public class ClientSocketManager implements Runnable {
     }
     
     public static void main(String[] args) throws Exception {
-        ClientSocketManager myCli = new ClientSocketManager();
-        myCli.run();
+    	System.out.println(InetAddress.getByName("127.0.0.1").toString().substring(InetAddress.getByName("127.0.0.1").toString().indexOf('/')+1));
+//        ClientSocketManager myCli = new ClientSocketManager();
+//        myCli.run();
     }
     
 }

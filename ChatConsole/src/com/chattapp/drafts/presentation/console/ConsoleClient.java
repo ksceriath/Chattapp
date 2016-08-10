@@ -1,9 +1,9 @@
 package com.chattapp.drafts.presentation.console;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 import com.chattapp.drafts.Controller;
 import com.chattapp.drafts.Handler;
@@ -11,16 +11,14 @@ import com.chattapp.drafts.Handler;
 public class ConsoleClient {
 	
 	private static Handler sHandler = Controller.getInstance();
-	private static List<PrintWriter> ostreams;
-//	private static PipedOutputStream ost2;
+	private static Map<String,PrintWriter> ostreams;
+	private static Map<String,String> connections = new HashMap<>();
 	private static boolean running = false;
-	static Boolean keepAlive = true;
+	volatile static Boolean keepAlive = true;
 	
 	public static void main(String[] args) {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		ostreams = Collections.synchronizedList(new ArrayList<PrintWriter>());
-//		PrintWriter pw = null;
-//		PrintWriter pw2 = null;
+		ostreams = Collections.synchronizedMap(new HashMap<String,PrintWriter>());
 		while(keepAlive) {
 			try {
 				String line = br.readLine();
@@ -29,20 +27,6 @@ public class ConsoleClient {
 				 } else {
 					 // pass on to the conversation handler
 					 processMessage(line);
-//					 if(ost!=null) {
-//						 if(pw==null) {
-//							 pw = new PrintWriter(ost);
-//						 }
-//						 pw.write(line);
-//						 pw.flush();
-//					 }
-//					 if(ost2!=null) {
-//						 if(pw2==null) {
-//							 pw2 = new PrintWriter(ost2);
-//						 }
-//						 pw2.write(line);
-//						 pw2.flush();
-//					 }
 				 }
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -56,11 +40,12 @@ public class ConsoleClient {
 	}
 	
 	public static void processMessage(String line) {
+		PrintWriter pw = null;
 		try {
 			int messageStart = line.indexOf(' ');
-			int index = Integer.parseInt(line.substring(0, messageStart));
+			String index = line.substring(0, messageStart);
 			String message = line.substring(messageStart);
-			PrintWriter pw = ostreams.get(index);
+			pw = ostreams.get(index);
 			pw.write(message);
 			pw.flush();
 		} catch(Exception E) {
@@ -71,6 +56,8 @@ public class ConsoleClient {
 	public static boolean processCommand(String line) {
 		if(line.equalsIgnoreCase("/exit")) {
 			sHandler.terminateAllConversations();
+			connections.clear();
+			closeAllOStreams();
 			return false;
 		} else if(line.startsWith("/connect")) {
 			String[] segments = line.split(" ");
@@ -84,7 +71,8 @@ public class ConsoleClient {
 					sHandler.createNewConnection(host, port, is, System.out);
 					System.out.println(Thread.currentThread().getName()+
 							":Added "+host+" at index "+ostreams.size());
-					ostreams.add(new PrintWriter(ost));
+					connections.put(ostreams.size()+"", host+":"+port);
+					ostreams.put(ostreams.size()+"",new PrintWriter(ost));
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -111,12 +99,15 @@ public class ConsoleClient {
 							PipedOutputStream ost2 = new PipedOutputStream();
 							PipedInputStream pis = new PipedInputStream(ost2);
 							String host = null;
-							while(host==null) {
+							while(host==null && ConsoleClient.keepAlive) {
 								host = sHandler.addUnQueuedConnection(pis, System.out);
 							}
-							System.out.println(Thread.currentThread().getName()+
-									":Added "+host+" at index "+ostreams.size());
-							ostreams.add(new PrintWriter(ost2));
+							if(host!=null) {
+								System.out.println(Thread.currentThread().getName()+
+										":Added "+host+" at index "+ostreams.size());
+								connections.put(ostreams.size()+"", host);
+								ostreams.put(ostreams.size()+"",new PrintWriter(ost2));
+							}
 						}
 					} catch (IOException e) {
 						e.printStackTrace();
@@ -125,8 +116,18 @@ public class ConsoleClient {
 			}).start();
 		} else if(line.startsWith("/close")) {
 			String[] segments = line.split(" ");
-			sHandler.terminateConversation(segments[1]);
+			String host = connections.get(segments[1]).split(":")[0];
+			sHandler.terminateConversation(host);
+			connections.remove(segments[1]);
+			ostreams.get(segments[1]).close();
 		}
 		return true;
 	}
+	
+	public static void closeAllOStreams() {
+		for(PrintWriter pw : ostreams.values()) {
+			pw.close();
+		}
+	}
+	
 }

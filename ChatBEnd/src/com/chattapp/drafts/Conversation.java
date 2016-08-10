@@ -3,17 +3,19 @@ package com.chattapp.drafts;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.Socket;
 
 public class Conversation {
+	private Socket socket;
     private InputStream inboundMsg;
     private OutputStream outboundMsg;
     private InputStream readFromLocal;
     private OutputStream writeToLocal;
     public Mapper inPipe;
     public Mapper outPipe;
-    
     Conversation(ClientSocketManager.ConBag bag) {
     	try {
+    		socket = bag.socket;
     		inboundMsg = bag.socket.getInputStream();
     		outboundMsg = bag.socket.getOutputStream();
     		readFromLocal = bag.readFrom;
@@ -23,14 +25,26 @@ public class Conversation {
     	}
     }
     
-    public void keepAlive(boolean state) {
-    	inPipe.keepAlive = false;
-    	outPipe.keepAlive = false;
+    public boolean isDead() {
+    	return socket.isInputShutdown() || socket.isOutputShutdown();
+    }
+    
+    public void kill() {
+    	try {
+			socket.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+//    	synchronized(this) {
+//    		keepAlive = state;
+//    		this.notifyAll();
+//    	}
     }
 
     public void startStreamMappers() {
-    	inPipe = new Mapper(inboundMsg,writeToLocal);
-    	outPipe = new Mapper(readFromLocal,outboundMsg);
+    	inPipe = new Mapper(this,inboundMsg,writeToLocal);
+    	outPipe = new Mapper(this,readFromLocal,outboundMsg);
     	new Thread(inPipe,"incomingDelivery").start();
     	new Thread(outPipe,"outgoingDelivery").start();
 //        try {
