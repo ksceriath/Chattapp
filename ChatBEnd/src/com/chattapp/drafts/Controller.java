@@ -3,18 +3,41 @@ package com.chattapp.drafts;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Deque;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-import com.chattapp.drafts.ClientSocketManager.ConBag;
-
 public class Controller implements Runnable, Handler{
+    static class ConBag {
+		String host;
+		int port;
+		InputStream readFrom;
+		OutputStream writeTo;
+		Socket socket;
+		ConBag(Socket x) {
+			socket = x;
+			host = x.getInetAddress().toString().substring(1);
+			port = x.getPort();
+		}
+		ConBag(String host, int port, InputStream ip, OutputStream op) {
+			try {
+				this.host = InetAddress.getByName(host).toString();
+				this.host = this.host.substring(this.host.indexOf('/')+1);
+				this.port = port;
+				this.readFrom = ip;
+				this.writeTo = op;
+			} catch (UnknownHostException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+    
     private Map<String, Conversation> runningConversations = new ConcurrentHashMap<>();
-    private Deque<ClientSocketManager.ConBag> queuedConBags = new ConcurrentLinkedDeque<>();
-    private Deque<ClientSocketManager.ConBag> unQueuedConBags = new ConcurrentLinkedDeque<>();
+    private Deque<ConBag> queuedConBags = new ConcurrentLinkedDeque<>();
+    private Deque<ConBag> unQueuedConBags = new ConcurrentLinkedDeque<>();
     private ClientSocketManager csm;
     private ServerSocketManager ssm;
     private int mPort;
@@ -37,7 +60,7 @@ public class Controller implements Runnable, Handler{
     	this.serverStatus = s;
     }
     
-    public boolean addConnection(ClientSocketManager.ConBag s) {
+    public boolean addConnection(ConBag s) {
     	if(!runningConversations.containsKey(s.socket.getInetAddress().toString())) {
     		return queuedConBags.offer(s);
     	}
@@ -49,7 +72,7 @@ public class Controller implements Runnable, Handler{
 	}
 	
 	public String addUnQueuedConnection(InputStream readFrom, OutputStream writeTo) {
-		ClientSocketManager.ConBag x = unQueuedConBags.pollFirst();
+		ConBag x = unQueuedConBags.pollFirst();
 		if(x!=null) {
 			x.readFrom = readFrom;
 			x.writeTo = writeTo;
@@ -135,7 +158,7 @@ public class Controller implements Runnable, Handler{
 //            t.join();
 			
 			while(keepAlive) {
-				ClientSocketManager.ConBag x;
+				ConBag x;
 				if((x = queuedConBags.pollFirst()) != null 
 						&& x.socket != null) {
 					Conversation conv;

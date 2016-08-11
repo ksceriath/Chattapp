@@ -13,7 +13,7 @@ public class Conversation {
     private OutputStream writeToLocal;
     public Mapper inPipe;
     public Mapper outPipe;
-    Conversation(ClientSocketManager.ConBag bag) {
+    Conversation(Controller.ConBag bag) {
     	try {
     		socket = bag.socket;
     		inboundMsg = bag.socket.getInputStream();

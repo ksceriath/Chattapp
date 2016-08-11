@@ -9,31 +9,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class ClientSocketManager implements Runnable {
 	
-	static class ConBag {
-		String host;
-		int port;
-		InputStream readFrom;
-		OutputStream writeTo;
-		Socket socket;
-		ConBag(Socket x) {
-			socket = x;
-			host = x.getInetAddress().toString().substring(1);
-			port = x.getPort();
-		}
-		ConBag(String host, int port, InputStream ip, OutputStream op) {
-			try {
-				this.host = InetAddress.getByName(host).toString();
-				this.host = this.host.substring(this.host.indexOf('/')+1);
-				this.port = port;
-				this.readFrom = ip;
-				this.writeTo = op;
-			} catch (UnknownHostException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	private Deque<ConBag> requests = new ConcurrentLinkedDeque<>();
+	private Deque<Controller.ConBag> requests = new ConcurrentLinkedDeque<>();
 	public boolean keepAlive = true;
 	private Controller controller;
 	
@@ -47,7 +23,7 @@ public class ClientSocketManager implements Runnable {
     public void run() {
     	System.out.println(Thread.currentThread().getName()+":Starting processing.");
         while(keepAlive) {
-        	ConBag request = requests.pollFirst();
+        	Controller.ConBag request = requests.pollFirst();
         	try {
         		if(request!=null) {
         			System.out.print(Thread.currentThread().getName()+":request found.");
@@ -73,7 +49,7 @@ public class ClientSocketManager implements Runnable {
 
     public void newRequest(String host, int port, InputStream ip, OutputStream op) {
     	System.out.println(Thread.currentThread().getName()+":Adding to requests queue.");
-    	requests.add(new ConBag(host,port,ip,op));
+    	requests.add(new Controller.ConBag(host,port,ip,op));
     	System.out.println(Thread.currentThread().getName()+":requests queue size:"+requests.size());
     }
     
