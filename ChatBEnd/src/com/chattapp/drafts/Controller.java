@@ -61,10 +61,11 @@ public class Controller implements Runnable, Handler{
     }
     
     public boolean addConnection(ConBag s) {
-    	if(!runningConversations.containsKey(s.socket.getInetAddress().toString())) {
-    		return queuedConBags.offer(s);
-    	}
-    	return true;
+    	runningConversations.remove(s.socket.getInetAddress().toString());
+    	return queuedConBags.offer(s);
+//    	if(!runningConversations.containsKey(s.socket.getInetAddress().toString())) {
+//    	}
+//    	return true;
     }
     
 	public boolean addUnConnection(ConBag conBag) {
@@ -91,6 +92,7 @@ public class Controller implements Runnable, Handler{
     		connTo = connTo.substring(connTo.indexOf('/')+1);
     		System.out.println(Thread.currentThread().getName()+":Terminate "+connTo+" - request received.");
 			runningConversations.get(connTo).kill();
+			runningConversations.remove(connTo);
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
@@ -162,13 +164,13 @@ public class Controller implements Runnable, Handler{
 				if((x = queuedConBags.pollFirst()) != null 
 						&& x.socket != null) {
 					Conversation conv;
-					if(runningConversations.containsKey(x.host)) {
-						conv = runningConversations.get(x.host);
-					} else {
+//					if(runningConversations.containsKey(x.host)) {
+//						conv = runningConversations.get(x.host);
+//					} else {
 						System.out.println(Thread.currentThread().getName()+":Starting new conversation with "+x.host);
 						conv = new Conversation(x);
 						runningConversations.put(x.host, conv);
-					}
+//					}
 					conv.startStreamMappers();
 					System.out.println(runningConversations.keySet());
 				}

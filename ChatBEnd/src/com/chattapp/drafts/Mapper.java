@@ -21,33 +21,6 @@ public class Mapper implements Runnable {
 	@Override
 	public void run() {
 		System.out.println(Thread.currentThread().getName()+":starting new map.");
-//		new Thread(new Runnable() {
-//			@Override
-//			public void run() {
-//				synchronized(context) {
-//					while(context.keepAlive()) {
-//						try {
-//							context.wait();
-//						} catch (InterruptedException e) {
-//							e.printStackTrace();
-//						}
-//					}
-//				};
-//				try {
-//					if("outgoingDelivery".equals(Thread.currentThread().getName())) {
-//						toStream.close();
-//						System.out.println(Thread.currentThread()
-//								.getName()+": closed tostream.");
-//					} else if("incomingDelivery".equals(Thread.currentThread().getName())) {
-//						fromStream.close();
-//						System.out.println(Thread.currentThread()
-//								.getName()+": closed fromstream.");
-//					}
-//				} catch (IOException e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		},Thread.currentThread().getName()+"Closer").start();
 		int x = 0;
 		/* Since we are closing the socket, not sure if this should be
 		 * required?

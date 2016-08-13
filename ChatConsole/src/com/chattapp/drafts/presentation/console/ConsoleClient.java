@@ -120,6 +120,7 @@ public class ConsoleClient {
 			sHandler.terminateConversation(host);
 			connections.remove(segments[1]);
 			ostreams.get(segments[1]).close();
+			ostreams.remove(segments[1]);
 		}
 		return true;
 	}
@@ -128,6 +129,7 @@ public class ConsoleClient {
 		for(PrintWriter pw : ostreams.values()) {
 			pw.close();
 		}
+		ostreams.clear();
 	}
 	
 }
